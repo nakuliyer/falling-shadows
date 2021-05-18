@@ -17,11 +17,14 @@ public class CameraMain : MonoBehaviour
     }
     public float zoomAnimationTime = 1.5f;
     public float trackAnimationTime = 3.0f;
-    public AnimationMode initialAnimationMode = AnimationMode.kZooming;
+    public AnimationMode initialAnimationMode = AnimationMode.kTracking;
     public AnimationMode defaultAnimationMode = AnimationMode.kTracking;
 
     /* Movement */
     public Vector3 optimalDistanceToPlayer = new Vector3(0, 4.0f, -20.0f);
+    public Vector3 zoomDistance = new Vector3(0, 2.0f, -5.0f);
+
+    [Tooltip("This is the sensitivity of the camera to moving")]
     public float minAnimationDistance = 0.5f;
 
     /* Rotation */
@@ -40,21 +43,32 @@ public class CameraMain : MonoBehaviour
     {
         animationEndpoints = (Vector3.zero, transform.position);
         animationMode = initialAnimationMode;
+        GetComponentInParent<Animator>().SetTrigger("StartInitialZoom");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!player.GetComponent<PlayerMain>().hitBottom)
+        if (!player.GetComponent<PlayerMain>().hitBottom || GetComponentInParent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime < 1)
         {
             return;
         }
 
         float playerY = player.transform.position.y;
-        Vector3 optimalPosition = new Vector3(0, playerY, 0) + optimalDistanceToPlayer;
-        if ((!isMoving || animationMode == AnimationMode.kTracking) &&
-            Vector3.Distance(animationEndpoints.Item2, optimalPosition) > minAnimationDistance)
+        Vector3 optimalPosition;
+        if (player.GetComponent<PlayerMain>().squashed)
         {
+            optimalPosition = new Vector3(player.transform.position.x, playerY, 0) + zoomDistance;
+            animationMode = AnimationMode.kZooming;
+        } else
+        {
+            optimalPosition = new Vector3(0, playerY, 0) + optimalDistanceToPlayer;
+            animationMode = AnimationMode.kTracking;
+            rotationDampening = 0;
+            rotationSpeed = 0.1f;
+        }
+
+        if (Vector3.Distance(animationEndpoints.Item2, optimalPosition) > minAnimationDistance) {
             isMoving = true;
             animationEndpoints = (transform.position, optimalPosition);
             currentFrame = 0;

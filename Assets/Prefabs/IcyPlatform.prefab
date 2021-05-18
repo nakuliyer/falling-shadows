@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7220519202170742848}
   - component: {fileID: 4322043108191902100}
   m_Layer: 0
-  m_Name: NormalPlatform
+  m_Name: IcyPlatform
   m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: be7671279dd9946af998f64e2e0c77a4, type: 2}
+  - {fileID: 2100000, guid: b33b72d2574b649b7b28024a11ff492d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -91,7 +91,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7220519202170742849}
-  m_Material: {fileID: 13400000, guid: bdfecfb29aa2f4b2a906afee3dec0924, type: 2}
+  m_Material: {fileID: 13400000, guid: 11f3c0d10f55c4550a2535e93d8f0b48, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2

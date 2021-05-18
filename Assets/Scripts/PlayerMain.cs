@@ -6,6 +6,7 @@ public class PlayerMain : MonoBehaviour
 {
     /* Truly public */
     public bool hitBottom = false;
+    public bool squashed = false;
 
     /* Movement */
     public float jumpWaitTime = 0.5f;
@@ -16,6 +17,7 @@ public class PlayerMain : MonoBehaviour
     public uint maxJumpCount = 8;
 
     /* Component */
+    public GameObject player;
     private Rigidbody rb;
 
     /* Player variables */
@@ -32,7 +34,14 @@ public class PlayerMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Time.time - lastJumpTime > jumpWaitTime)
+        GetComponent<BoxCollider>().size = player.transform.localScale;
+
+        if (squashed)
+        {
+            return;
+        }
+
+        if (Time.time - lastJumpTime > jumpWaitTime)
         {
             UseKeyboard();
         }
@@ -40,6 +49,11 @@ public class PlayerMain : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (squashed)
+        {
+            return;
+        }
+
         float colliderY = collision.gameObject.transform.position.y;
         float squashDistance = transform.localScale.y / 2;
 
@@ -48,8 +62,9 @@ public class PlayerMain : MonoBehaviour
 
         if (somethingAbove && isOnGround)
         {
+            Debug.Log("detected");
             OnSquashed();
-        } else if (somethingBelow)
+        } else if (somethingBelow && collision.gameObject.tag == "Ground")
         {
             OnHitGround();
         }
@@ -84,6 +99,7 @@ public class PlayerMain : MonoBehaviour
     {
         if (jumpCount < maxJumpCount)
         {
+            GetComponentInChildren<Animator>().SetTrigger("About To Jump");
             float actualUpwardsThrust = upwardsThrust - jumpCount * upwardsThrustDegradation;
             float actualDirectionalThrust = directionalThrust - jumpCount * directionalThrustDegradation;
             rb.velocity = Vector3.up * actualUpwardsThrust + horizontalDirection * actualDirectionalThrust;
@@ -95,7 +111,9 @@ public class PlayerMain : MonoBehaviour
 
     private void OnSquashed()
     {
-        Debug.Log("squashed");
+        squashed = true;
+        GetComponentInChildren<Animator>().SetTrigger("Death");
+        rb.velocity = Vector3.zero;
     }
 
     private void OnHitGround()
@@ -103,5 +121,10 @@ public class PlayerMain : MonoBehaviour
         jumpCount = 0;
         isOnGround = true;
         hitBottom = true;
+        if (GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime > 1)
+        {
+            GetComponentInChildren<Animator>().SetTrigger("Player Hit Bottom");
+        }
+        // Debug.Log("bot");
     }
 }
